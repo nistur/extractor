@@ -25,8 +25,8 @@ module rounded_box(x, y, z, r)
 module hex_grid(s, gap, nx, ny, thickness)
 {
   cos30= cos(30);
-  translate([-(s+gap)*cos30/2*nx,-(s+gap)/2*ny,0])
-  for(j = [0 : ny])
+  translate([-(nx*(s+gap)*cos30)/2,-(s+gap)/2*ny,0])
+  for(j = [0 : nx])
     for(i = [0 : ny])
       {
 	offs = (j % 2) * ((s + gap)/2);

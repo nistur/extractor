@@ -39,8 +39,25 @@ module inner_grille()
   translate([0, 0, -thickness/2])
     intersection()
     { 
-      hex_grid(10, 2, 20, 20, thickness * 2);
+	hex_grid(hex_size, hex_spacing,3 +  fan_size / (hex_size + hex_spacing), 1+fan_size / (hex_size + hex_spacing), thickness * 2);
       translate([0,0,-thickness/2]) cylinder(r=fan_size/2, h=thickness * 3);
+    }
+}
+
+module __guide()
+{
+    translate([fan_size/4 - thickness/2 - clearance,fan_size/2,-thickness/2]) cube([thickness + (2*clearance),padding,thickness * 2]);
+    translate([-fan_size/4 + thickness/2 - clearance,fan_size/2,-thickness/2]) cube([thickness + (2*clearance),padding,thickness * 2]);
+}
+
+module guide()
+{
+    union()
+    {
+	rotate([0,0,  0]) __guide();
+	rotate([0,0, 90]) __guide();
+	rotate([0,0,180]) __guide();
+	rotate([0,0,270]) __guide();
     }
 }
 
@@ -53,6 +70,7 @@ module filterguard()
     inner_screw_holes();
     inner_grille();
     translate([0,0,thickness/2-(fan_size*squish)/2]) scale([1, 1, squish]) sphere(r=fan_size/2);
+    guide();
   }
 
 }

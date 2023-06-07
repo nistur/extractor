@@ -34,7 +34,13 @@ connector_taperlength=10;
 connector_taperamount=5;
 screw_diameter=4.3;
 screw_separation=105;
-screwpost_diameter=6;
+screwpost_diameter=10;
+screwhead_diameter=6;
+screwhead_depth=4;
+hex_size=10;
+hex_spacing=1;
+
+cablecutout_diameter=10;
 
 clearance=0.1;
 

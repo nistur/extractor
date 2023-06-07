@@ -39,7 +39,7 @@ module grille()
   translate([0, 0, enclosure_thickness-thickness*1.5])
     intersection()
     { 
-      hex_grid(10, 2, 20, 20, thickness * 2);
+	hex_grid(hex_size, hex_spacing, 3 + fan_size / (hex_size + hex_spacing), 1+fan_size / (hex_size + hex_spacing), thickness * 2);
       translate([0,0,-thickness/2]) cylinder(r=fan_size/2, h=thickness * 3);
     }
 }
@@ -52,12 +52,45 @@ module screwposts()
   translate([-screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
 }
 
+module __fanguide()
+{
+    translate([fan_size/4 - thickness/2,fan_size/2+clearance,thickness]) cube([thickness,padding - clearance,fan_thickness + filter_thickness]);
+    translate([-fan_size/4 + thickness/2,fan_size/2+clearance,thickness]) cube([thickness,padding - clearance,fan_thickness + filter_thickness]);
+}
+
+module fanguide()
+{
+    union()
+    {
+	__fanguide();
+	rotate([0,0,90]) __fanguide();
+	rotate([0,0,180]) __fanguide();
+	rotate([0,0,270]) __fanguide();
+    }
+}
+
+module screw()
+{
+    cylinder(r=screw_diameter/2, h=enclosure_thickness+1);
+    translate([0,0,enclosure_thickness+0.5-screwhead_depth]) cylinder(r=clearance + screwhead_diameter/2, h=screwhead_depth+0.5);
+}
+
 module screwholes()
 {
-  translate([-screw_separation/2, -screw_separation/2, -0.5]) cylinder(r=screw_diameter/2, h=enclosure_thickness+1);
-  translate([-screw_separation/2,  screw_separation/2, -0.5]) cylinder(r=screw_diameter/2, h=enclosure_thickness+1);
-  translate([ screw_separation/2, -screw_separation/2, -0.5]) cylinder(r=screw_diameter/2, h=enclosure_thickness+1);
-  translate([ screw_separation/2,  screw_separation/2, -0.5]) cylinder(r=screw_diameter/2, h=enclosure_thickness+1);
+    translate([-screw_separation/2, -screw_separation/2, -0.5]) screw();
+    translate([-screw_separation/2,  screw_separation/2, -0.5]) screw();
+    translate([ screw_separation/2, -screw_separation/2, -0.5]) screw();
+    translate([ screw_separation/2,  screw_separation/2, -0.5]) screw();
+}
+
+module cable_cutout()
+{
+    translate([0,fan_size/2 + padding + thickness*1.5,cablecutout_diameter/2])
+    {
+	rotate([90,0,0]) cylinder(r=cablecutout_diameter/2,h=thickness*2);
+	translate([-cablecutout_diameter/2,-thickness*2,-(1+cablecutout_diameter/2)]) cube([cablecutout_diameter, thickness*2, cablecutout_diameter/2+1]);
+    }
+    
 }
 
 module enclosure()
@@ -68,8 +101,10 @@ module enclosure()
     {
       enclosure_base();
       screwposts();
+      fanguide();
     }
     grille();
     screwholes();
+    cable_cutout();
   }
 }
