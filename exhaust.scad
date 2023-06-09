@@ -21,34 +21,8 @@
  * nistur@gmail.com
  */
 
-fan_size=120;
-fan_thickness=25;
-filter_thickness=5;
-padding=5;
-corner_radius=5;
-thickness=2.5;
-connector_id=85;
-connector_od=90;
-connector_length=80;
-connector_taperlength=10;
-connector_taperamount=5;
-exhaust_length=50;
-screw_diameter=4.3;
-screw_separation=105;
-screwpost_diameter=10;
-screwhead_diameter=7.2;
-screwhead_depth=4;
-hex_size=10;
-hex_spacing=1;
+include<modules/mod_exhaust.scad>
 
-cablecutout_diameter=10;
-
-clearance=0.1;
-
-$fn = $preview ? 60 : 360;
-
-// size is:
-// + size of the fan
-// + some padding around the outside for routing cables
-// - Some clearance to let the enclosure fit on top
-base_size=fan_size+(padding*2)-(clearance*2);
+// Rotate so the resulting model is the correct orientation for printing
+rotate([180,0,0])
+exhaust();

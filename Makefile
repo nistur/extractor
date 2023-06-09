@@ -1,6 +1,7 @@
 OBJS=enclosure.stl \
 	connector.stl \
-	filterguard.stl
+	filterguard.stl	\
+	exhaust.stl
 
 .phony: all
 

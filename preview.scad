@@ -25,6 +25,7 @@ include <modules/mod_enclosure.scad>
 include <modules/mod_connector.scad>
 include <modules/mod_fan.scad>
 include <modules/mod_filterguard.scad>
+include <modules/mod_exhaust.scad>
 
 col_1=[0.882, 0.118, 0.796];
 col_2=[0.118, 0.796, 0.882];
@@ -39,3 +40,5 @@ translate([0,0,thickness]) rotate([0,180,0]) connector();
 color(col_1)
 translate([0,0,thickness + fan_thickness]) filterguard();
 //translate([0,0,thickness]) fan();
+
+translate([fan_size * 2, 0, -connector_length]) exhaust();

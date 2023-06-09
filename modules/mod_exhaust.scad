@@ -24,30 +24,32 @@
 include <../params.scad>
 include <../lib/utils.scad>
 
-module connector_outer()
+
+d = connector_od + (connector_od - connector_id);
+
+module exhaust_outer()
 {
-    rad=(connector_od/2) - clearance;
-    cylinder(h=connector_length-connector_taperlength, r=rad);
-    translate([0,0,connector_length-connector_taperlength])
-      cylinder(h=connector_taperlength,r1=rad, r2=connector_od/2-connector_taperamount);
+    cylinder(h=exhaust_length, r=(d/2));
 }
 
-module connector_inner()
+module exhaust_inner()
 {
     translate([0,0,-0.5])
-      cylinder(h=connector_length+1, r=connector_id/2);
+      cylinder(h=exhaust_length+1, r=connector_od/2);
 }
 
-module connector_pipe()
+module exhaust_pipe()
 {
     difference()
     {
-        connector_outer();
-        connector_inner();
+        exhaust_outer();
+        exhaust_inner();
+	translate([0,0,exhaust_length-connector_taperlength])
+	    cylinder(h=connector_taperlength,r1=connector_od/2, r2=(connector_od+connector_taperamount)/2);
     }
 }
 
-module screw_holes()
+module mounting_screw_holes()
 {
   translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
   translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
@@ -55,18 +57,31 @@ module screw_holes()
   translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
 }
 
-module mount()
+module exhaust_grille()
 {
-    difference()
+    n = d / (hex_size + hex_spacing);
+    intersection()
     {
-      rounded_box(base_size, base_size, thickness, corner_radius);
-        connector_inner();
-	screw_holes();
+	hex_grid(hex_size, hex_spacing, 1+n, n, thickness * 2);
+	exhaust_inner();
     }
 }
 
-module connector()
+module mounting_plate()
 {
-  translate([0,0,thickness]) connector_pipe();
-  mount();
+    union()
+    {
+	difference()
+	{
+	    rounded_box(base_size, base_size, thickness, corner_radius);
+	    translate([0,0,-thickness/2]) exhaust_grille();
+	    mounting_screw_holes();
+	}
+    }
+}
+
+module exhaust()
+{
+  translate([0,0,thickness]) exhaust_pipe();
+  mounting_plate();
 }
