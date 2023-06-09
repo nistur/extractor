@@ -25,66 +25,77 @@ include<../params.scad>
 include<../lib/utils.scad>
 
 enclosure_thickness=thickness*2 + fan_thickness + filter_thickness;
-module enclosure_base()
+module en_base()
 {
-  difference()
-  {
-    rounded_box(fan_size+((padding+thickness)*2), fan_size+((padding+thickness)*2), enclosure_thickness, corner_radius+thickness/2);
-      translate([0,0,-1]) rounded_box(fan_size+(padding*2), fan_size+(padding*2), enclosure_thickness-thickness+1, corner_radius);
-  }
-}
-
-module grille()
-{
-  translate([0, 0, enclosure_thickness-thickness*1.5])
-    intersection()
-    { 
-	hex_grid(hex_size, hex_spacing, 3 + fan_size / (hex_size + hex_spacing), 1+fan_size / (hex_size + hex_spacing), thickness * 2);
-      translate([0,0,-thickness/2]) cylinder(r=fan_size/2, h=thickness * 3);
+    // Base shape for the enclosure, a hollow rounded box
+    difference()
+    {
+	rounded_box(fan_size+((padding+thickness)*2), fan_size+((padding+thickness)*2), enclosure_thickness, corner_radius+thickness/2);
+	translate([0,0,-1]) rounded_box(fan_size+(padding*2), fan_size+(padding*2), enclosure_thickness-thickness+1, corner_radius);
     }
 }
 
-module screwposts()
+module en_grille()
 {
-  translate([ screw_separation/2, -screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
-  translate([ screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
-  translate([-screw_separation/2, -screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
-  translate([-screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
+    // hex grille on the front of the enclosure
+    translate([0, 0, enclosure_thickness-thickness*1.5])
+    intersection()
+    { 
+	hex_grid(hex_size, hex_spacing, 3 + fan_size / (hex_size + hex_spacing), 1+fan_size / (hex_size + hex_spacing), thickness * 2);
+	translate([0,0,-thickness/2]) cylinder(r=fan_size/2, h=thickness * 3);
+    }
 }
 
-module __fanguide()
+module en_screwposts()
 {
+    // A thick cylinder in each corner which the screws go through - also used for sandwiching the fan in place
+    translate([ screw_separation/2, -screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
+    translate([ screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
+    translate([-screw_separation/2, -screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
+    translate([-screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
+}
+
+module _en_fanguide()
+{
+    // These are rails that go along the side of the enclosure. They should leave a space of `fan-size` in between them
+    // (plus clearance) allowing for the fan to be easily slid into place accurately. They also will help locate the filter
+    // guard piece in a similar way
     translate([fan_size/4 - thickness/2,fan_size/2+clearance,thickness]) cube([thickness,padding - clearance,fan_thickness + filter_thickness]);
     translate([-fan_size/4 + thickness/2,fan_size/2+clearance,thickness]) cube([thickness,padding - clearance,fan_thickness + filter_thickness]);
 }
 
-module fanguide()
+module en_fanguide()
 {
     union()
     {
-	__fanguide();
-	rotate([0,0,90]) __fanguide();
-	rotate([0,0,180]) __fanguide();
-	rotate([0,0,270]) __fanguide();
+	// create one pair of guide rails, then rotate them
+	rotate([0,0,  0]) _en_fanguide();
+	rotate([0,0, 90]) _en_fanguide();
+	rotate([0,0,180]) _en_fanguide();
+	rotate([0,0,270]) _en_fanguide();
     }
 }
 
-module screw()
+module en_screw()
 {
+    // A long cylinder for the shaft, and a shorter one for the head
     cylinder(r=screw_diameter/2, h=enclosure_thickness+1);
-    translate([0,0,enclosure_thickness+0.5-screwhead_depth]) cylinder(r=clearance + screwhead_diameter/2, h=screwhead_depth+0.5);
+    translate([0,0,enclosure_thickness+0.5-screwhead_depth]) cylinder(r=screwhead_diameter/2, h=screwhead_depth+0.5);
 }
 
-module screwholes()
+module en_screwholes()
 {
-    translate([-screw_separation/2, -screw_separation/2, -0.5]) screw();
-    translate([-screw_separation/2,  screw_separation/2, -0.5]) screw();
-    translate([ screw_separation/2, -screw_separation/2, -0.5]) screw();
-    translate([ screw_separation/2,  screw_separation/2, -0.5]) screw();
+    // 4 screws, one at each corner of the fan
+    translate([-screw_separation/2, -screw_separation/2, -0.5]) en_screw();
+    translate([-screw_separation/2,  screw_separation/2, -0.5]) en_screw();
+    translate([ screw_separation/2, -screw_separation/2, -0.5]) en_screw();
+    translate([ screw_separation/2,  screw_separation/2, -0.5]) en_screw();
 }
 
-module cable_cutout()
+module en_cable_cutout()
 {
+    // This is a simple cutout on one side, Basically an arch shape made by a circular cutout, with its edges joined
+    // to the edge, like an elongated D. If I had some grommets, I might make it fit one of those.
     translate([0,fan_size/2 + padding + thickness*1.5,cablecutout_diameter/2])
     {
 	rotate([90,0,0]) cylinder(r=cablecutout_diameter/2,h=thickness*2);
@@ -95,16 +106,22 @@ module cable_cutout()
 
 module enclosure()
 {
-  difference()
-  {
-    union()
+    difference()
     {
-      enclosure_base();
-      screwposts();
-      fanguide();
+	union()
+	{
+	    // The basic shape of the enclosure - a hollow rounded box
+	    en_base();
+	    // The screwposts that hold the enclosure together
+	    en_screwposts();
+	    // Some guide rails on the side which guide the filter guard and fan
+	    en_fanguide();
+	}
+	// Cut out the hex grille from the front
+	en_grille();
+	// Cut out the screw holes to hold everything together
+	en_screwholes();
+	// Cut out a space for the wires to come out
+	en_cable_cutout();
     }
-    grille();
-    screwholes();
-    cable_cutout();
-  }
 }

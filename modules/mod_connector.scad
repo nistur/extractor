@@ -24,49 +24,59 @@
 include <../params.scad>
 include <../lib/utils.scad>
 
-module connector_outer()
+module co_outer()
 {
     rad=(connector_od/2) - clearance;
+    // The connector pipe
     cylinder(h=connector_length-connector_taperlength, r=rad);
+    // Add a chamfer on the end to allow easy fitting
     translate([0,0,connector_length-connector_taperlength])
       cylinder(h=connector_taperlength,r1=rad, r2=connector_od/2-connector_taperamount);
 }
 
-module connector_inner()
+module co_inner()
 {
     translate([0,0,-0.5])
       cylinder(h=connector_length+1, r=connector_id/2);
 }
 
-module connector_pipe()
+module co_pipe()
 {
     difference()
     {
-        connector_outer();
-        connector_inner();
+	// The outside of the connector pipe
+	co_outer();
+	// Cut out the inside of the pipe
+        co_inner();
     }
 }
 
-module screw_holes()
+module co_screwholes()
 {
-  translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
-  translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
-  translate([-screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
-  translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    // 4 Mounting screws - follows the same pattern as the fan that will be mounted
+    translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    translate([-screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
 }
 
-module mount()
+module co_mount()
 {
     difference()
     {
-      rounded_box(base_size, base_size, thickness, corner_radius);
-        connector_inner();
-	screw_holes();
+	// The base shape - a simple rounded box
+	rounded_box(base_size, base_size, thickness, corner_radius);
+	// Cut the air passage through the base
+        co_inner();
+	// Cut out the screwholes
+	co_screwholes();
     }
 }
 
 module connector()
 {
-  translate([0,0,thickness]) connector_pipe();
-  mount();
+    // The connector pipe - this will go inside a connecting exhaust pipe
+    translate([0,0,thickness]) co_pipe();
+    // The mounting plate which attaches the extractor fan
+    co_mount();
 }

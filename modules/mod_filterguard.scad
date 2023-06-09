@@ -24,53 +24,63 @@
 include<../params.scad>
 include<../lib/utils.scad>
 
-module inner_screw_holes()
+module fg_screwposts()
 {
-  d = screwpost_diameter + (clearance*2);
-  translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
-  translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
-  translate([-screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
-  translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
+    d = screwpost_diameter + (clearance*2);
+    translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
+    translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
+    translate([-screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
+    translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=d/2, h=thickness*2);
 }
 
 
-module inner_grille()
+module fg_grille()
 {
-  translate([0, 0, -thickness/2])
+    translate([0, 0, -thickness/2])
     intersection()
     { 
 	hex_grid(hex_size, hex_spacing,3 +  fan_size / (hex_size + hex_spacing), 1+fan_size / (hex_size + hex_spacing), thickness * 2);
-      translate([0,0,-thickness/2]) cylinder(r=fan_size/2, h=thickness * 3);
+	translate([0,0,-thickness/2]) cylinder(r=fan_size/2, h=thickness * 3);
     }
 }
 
-module __guide()
+module _fg_guide()
 {
     translate([fan_size/4 - thickness/2 - clearance,fan_size/2,-thickness/2]) cube([thickness + (2*clearance),padding,thickness * 2]);
     translate([-fan_size/4 + thickness/2 - clearance,fan_size/2,-thickness/2]) cube([thickness + (2*clearance),padding,thickness * 2]);
 }
 
-module guide()
+module fg_guide()
 {
+    // 2 guide rails on each side to align this part. Just do it once, and rotate
     union()
     {
-	rotate([0,0,  0]) __guide();
-	rotate([0,0, 90]) __guide();
-	rotate([0,0,180]) __guide();
-	rotate([0,0,270]) __guide();
+	rotate([0,0,  0]) _fg_guide();
+	rotate([0,0, 90]) _fg_guide();
+	rotate([0,0,180]) _fg_guide();
+	rotate([0,0,270]) _fg_guide();
     }
 }
 
 module filterguard()
 {
-  squish = 0.04;
-  difference()
-  {
-    rounded_box(base_size, base_size, thickness, corner_radius);
-    inner_screw_holes();
-    inner_grille();
-    translate([0,0,thickness/2-(fan_size*squish)/2]) scale([1, 1, squish]) sphere(r=fan_size/2);
-    guide();
-  }
+    squish = 0.04;
+    difference()
+    {
+	// Base shape - make the same as the mount
+	rounded_box(base_size, base_size, thickness, corner_radius);
+	
+	// cut out space for the screw posts
+	fg_screwposts();
+	
+	// cut out a grille
+	fg_grille();
+	
+	// Add a squished sphere on one side to add fan clearance
+	translate([0,0,thickness/2-(fan_size*squish)/2]) scale([1, 1, squish]) sphere(r=fan_size/2);
+	
+	// Cut out the guides on the side
+	fg_guide();
+    }
 
 }

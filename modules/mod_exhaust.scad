@@ -27,61 +27,74 @@ include <../lib/utils.scad>
 
 d = connector_od + (connector_od - connector_id);
 
-module exhaust_outer()
+module ex_outer()
 {
     cylinder(h=exhaust_length, r=(d/2));
 }
 
-module exhaust_inner()
+module ex_inner()
 {
     translate([0,0,-0.5])
       cylinder(h=exhaust_length+1, r=connector_od/2);
 }
 
-module exhaust_pipe()
+module ex_connector()
 {
+    // Create a simple connector pipe - this should be the opposite of the extractor - it should be wider than
+    // the pipe's OD, and slot over the top - it should therefore also have a taper on the inside
     difference()
     {
-        exhaust_outer();
-        exhaust_inner();
+        ex_outer();
+        ex_inner();
 	translate([0,0,exhaust_length-connector_taperlength])
 	    cylinder(h=connector_taperlength,r1=connector_od/2, r2=(connector_od+connector_taperamount)/2);
     }
 }
 
-module mounting_screw_holes()
+module ex_screw_holes()
 {
-  translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
-  translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
-  translate([-screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
-  translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    // Use the same mounting pattern as is used in the extractor enclosure. No reason to define another
+    translate([ screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    translate([ screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    translate([-screw_separation/2,  screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
+    translate([-screw_separation/2, -screw_separation/2, -thickness/2]) cylinder(r=screw_diameter/2, h=thickness*2);
 }
 
-module exhaust_grille()
+module ex_grille()
 {
+    // Guess at the amount of hexes we need to fill the space
+    // (this is correct in one direction, but because each row overlaps slightly
+    // and I don't feel like working out the maths, this is fine for now)
     n = d / (hex_size + hex_spacing);
     intersection()
     {
 	hex_grid(hex_size, hex_spacing, 1+n, n, thickness * 2);
-	exhaust_inner();
+	ex_inner();
     }
 }
 
-module mounting_plate()
+module ex_mount()
 {
     union()
     {
 	difference()
 	{
+	    // Base shape - same as the extractor connector, just for simplicity
 	    rounded_box(base_size, base_size, thickness, corner_radius);
-	    translate([0,0,-thickness/2]) exhaust_grille();
-	    mounting_screw_holes();
+	    // cut out a hex grille - to keep leaves etc out I guess
+	    translate([0,0,-thickness/2]) ex_grille();
+	    // some mounting holes
+	    ex_screw_holes();
 	}
     }
 }
 
 module exhaust()
 {
-  translate([0,0,thickness]) exhaust_pipe();
-  mounting_plate();
+    // Connector, should be the opposite to that used in `connector` so that these could be
+    // used together - or used with a pipe in between
+    translate([0,0,thickness]) ex_connector();
+
+    // Add the mounting plate
+    ex_mount();
 }

@@ -23,5 +23,7 @@
 
 module fan()
 {
-  translate([-fan_size/2, -fan_size/2, 0]) cube([fan_size, fan_size, fan_thickness]);
+    // If I can be bothered, might make something that looks a little more like a fan,
+    // but it's just for previewing the fit, so a cuboid of the correct size is sufficient
+    translate([-fan_size/2, -fan_size/2, 0]) cube([fan_size, fan_size, fan_thickness]);
 }

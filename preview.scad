@@ -31,14 +31,22 @@ col_1=[0.882, 0.118, 0.796];
 col_2=[0.118, 0.796, 0.882];
 col_3=[0.796, 0.882, 0.118];
 
+// Enclosure holding the extractor fan
 color(col_3)
 enclosure();
 
+// Mount connecting the exhaust pipe, to the extractor fan and enclosure
 color(col_2)
 translate([0,0,thickness]) rotate([0,180,0]) connector();
 
+// Guard to hold the carbon filter in the enclosure and away from
+// the fan blades
 color(col_1)
 translate([0,0,thickness + fan_thickness]) filterguard();
-//translate([0,0,thickness]) fan();
 
+// Separate exhaust mount - this will connect the pipe to the outside
 translate([fan_size * 2, 0, -connector_length]) exhaust();
+
+
+// Placeholder to see that the fan fits in enclosure
+//translate([0,0,thickness]) fan();
