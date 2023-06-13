@@ -91,7 +91,7 @@ cablecutout_diameter=10;
 
 // Clearance between plastic-plastic parts. Things like screws do not respect this, as it may be desirable to
 // tweak their fit manually
-clearance=0.1;
+clearance=0.2;
 
 $fn = $preview ? 60 : 360;
 

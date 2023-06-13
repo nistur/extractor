@@ -68,7 +68,7 @@ module filterguard()
     difference()
     {
 	// Base shape - make the same as the mount
-	rounded_box(base_size, base_size, thickness, corner_radius);
+	rounded_box(base_size - (clearance * 2), base_size - (clearance * 2), thickness, corner_radius);
 	
 	// cut out space for the screw posts
 	fg_screwposts();

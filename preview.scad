@@ -42,11 +42,12 @@ translate([0,0,thickness]) rotate([0,180,0]) connector();
 // Guard to hold the carbon filter in the enclosure and away from
 // the fan blades
 color(col_1)
-translate([0,0,thickness + fan_thickness]) filterguard();
+translate([0,0,thickness + fan_thickness + (2 * clearance)]) filterguard();
 
 // Separate exhaust mount - this will connect the pipe to the outside
 translate([fan_size * 2, 0, -connector_length]) exhaust();
 
 
 // Placeholder to see that the fan fits in enclosure
-//translate([0,0,thickness]) fan();
+color("black")
+translate([0,0,thickness + clearance]) fan();

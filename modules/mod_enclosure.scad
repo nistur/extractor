@@ -24,14 +24,21 @@
 include<../params.scad>
 include<../lib/utils.scad>
 
-enclosure_thickness=thickness*2 + fan_thickness + filter_thickness;
+// This seems like a sort of arbitrary list of sizes, but is roughly as follows:
+//  thickness * 3 - Connector base plate, filter guard, top of enclosure
+//  fan thickness + filter thickness - self explanatory
+//  clearance * 4 - either side of the fan, either side of the filter
+// The choice of clearance amounts is fairly arbitrary, but should hopefully allow everything to fit
+enclosure_thickness=thickness*3 + fan_thickness + filter_thickness + (clearance * 4);
 module en_base()
 {
+    size_outer = fan_size+((padding+thickness)*2);
+    size_inner = fan_size+(padding*2) + (clearance * 2);
     // Base shape for the enclosure, a hollow rounded box
     difference()
     {
-	rounded_box(fan_size+((padding+thickness)*2), fan_size+((padding+thickness)*2), enclosure_thickness, corner_radius+thickness/2);
-	translate([0,0,-1]) rounded_box(fan_size+(padding*2), fan_size+(padding*2), enclosure_thickness-thickness+1, corner_radius);
+	rounded_box(size_outer, size_outer, enclosure_thickness, corner_radius+thickness/2);
+	translate([0,0,-1]) rounded_box(size_inner, size_inner, enclosure_thickness-thickness+1, corner_radius);
     }
 }
 
@@ -46,13 +53,20 @@ module en_grille()
     }
 }
 
+module _en_screwpost()
+{
+    r = (screwpost_diameter/2) - clearance;
+    h = (thickness * 2) + filter_thickness;
+    cylinder(r=r, h=h);
+}
+
 module en_screwposts()
 {
     // A thick cylinder in each corner which the screws go through - also used for sandwiching the fan in place
-    translate([ screw_separation/2, -screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
-    translate([ screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
-    translate([-screw_separation/2, -screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
-    translate([-screw_separation/2,  screw_separation/2, fan_thickness + filter_thickness + thickness]) rotate([180,0,0])cylinder(r=screwpost_diameter/2, h=filter_thickness);
+    translate([ screw_separation/2, -screw_separation/2, enclosure_thickness]) rotate([180,0,0]) _en_screwpost();
+    translate([ screw_separation/2,  screw_separation/2, enclosure_thickness]) rotate([180,0,0]) _en_screwpost();
+    translate([-screw_separation/2, -screw_separation/2, enclosure_thickness]) rotate([180,0,0]) _en_screwpost();
+    translate([-screw_separation/2,  screw_separation/2, enclosure_thickness]) rotate([180,0,0]) _en_screwpost();
 }
 
 module _en_fanguide()

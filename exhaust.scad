@@ -23,6 +23,4 @@
 
 include<modules/mod_exhaust.scad>
 
-// Rotate so the resulting model is the correct orientation for printing
-rotate([180,0,0])
 exhaust();

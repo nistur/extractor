@@ -65,7 +65,7 @@ module co_mount()
     difference()
     {
 	// The base shape - a simple rounded box
-	rounded_box(base_size, base_size, thickness, corner_radius);
+	rounded_box(base_size-(clearance*2), base_size-(clearance*2), thickness, corner_radius);
 	// Cut the air passage through the base
         co_inner();
 	// Cut out the screwholes
